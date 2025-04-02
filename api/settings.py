@@ -7,7 +7,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class CorsSettings(BaseModel):
     """CORS Middleware Settings."""
 
-    allow_origins: list[str] = ["*"]
+    allow_origins: list[str] = [
+        "http://localhost",
+        "http://127.0.0.1",
+        "http://0.0.0.0",
+    ]
     allow_methods: list[str] = ["*"]
     allow_headers: list[str] = ["*"]
     allow_credentials: bool = True
@@ -29,3 +33,15 @@ class Settings(BaseSettings):
     VERSION: str = "0.0.1"
 
     CORS_MIDDLEWARE: CorsSettings = CorsSettings()
+
+    SALT: str = "1" * 16
+
+    DB_HOST: str = "localhost"
+    DB_PORT: int = 5432
+    DB_USER: str = "postgres"
+    DB_PASSWORD: str = "postgres"
+    DB_NAME: str = "postgres"
+
+    def get_db_url(self) -> str:
+        """Get the database URL."""
+        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"

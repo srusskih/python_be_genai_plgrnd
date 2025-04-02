@@ -1,16 +1,28 @@
 """API's Fast API Application."""
 
+import contextlib
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routers import root
+from api.db import create_engine
+from api.routers import v1
 from api.settings import Settings
 
 
-def __attach_routers(app: FastAPI) -> FastAPI:
-    """Attach routers to the app."""
-    app.include_router(root.router)
-    return app
+@contextlib.asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application ASGI's lifespan handler."""
+    settings = app.state.settings
+
+    engine = create_engine(db_url=settings.get_db_url())
+    app.state.db_engine = engine
+
+    try:
+        yield
+    finally:
+        app.state.db_engine = None
+        await engine.dispose()
 
 
 def create_app(settings: Settings) -> FastAPI:
@@ -23,10 +35,12 @@ def create_app(settings: Settings) -> FastAPI:
         docs_url="/docs",
         redoc_url="/redoc",
         openapi_url="/swagger.json",
+        lifespan=lifespan,
     )
+    app.state.settings = settings
 
     # Routers
-    app = __attach_routers(app)
+    app.include_router(v1.router)
 
     # Middlewares
     app.add_middleware(

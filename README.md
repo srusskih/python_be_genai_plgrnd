@@ -121,6 +121,6 @@ pytest tests/
 ### How to run code checkers & formatter
 
 ```sh
-ruff format api/
-ruff check api/ --fix
+ruff format api/ tests/
+ruff check api/ tests/ --fix
 ```
