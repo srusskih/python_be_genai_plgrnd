@@ -5,19 +5,27 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, Security
 from fastapi.security import OAuth2PasswordBearer
 
+from api.dependencies import get_app_settings
+from api.settings import Settings
 from api.users.dependencies import get_user_manager
 from api.users.managers import UserManager
 
 from .managers import AuthManager
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/sign_in")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
 
 
 async def get_auth_manager(
+    settings: Annotated[Settings, Depends(get_app_settings)],
     user_manager: Annotated[UserManager, Depends(get_user_manager)],
 ):
     """DI Factory to build AuthManager instance."""
-    manager = AuthManager(user_manager=user_manager)
+    manager = AuthManager(
+        user_manager=user_manager,
+        verification_token_audience=settings.JWT_AUDIENCE,
+        verification_token_secret=settings.JWT_SECRET,
+        verification_token_lifetime_seconds=settings.JWT_LIFETIME_SECONDS,
+    )
     return manager
 
 

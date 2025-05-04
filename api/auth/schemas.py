@@ -19,9 +19,17 @@ class UserSignInRequest(BaseModel):
 class UserSignInResponse(BaseModel):
     """User sign-in response schema."""
 
+    # required for "Playground API Contract"
     id: int
     email: EmailStr
     authentication_token: str
+
+
+class TokenResponse(BaseModel):
+    """For OAuth2 token response."""
+
+    access_token: str
+    token_type: str
 
 
 class SignOutUser(BaseModel):

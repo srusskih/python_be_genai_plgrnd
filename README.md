@@ -48,7 +48,8 @@ docker exec -ti <CONTAINER ID> /bin/bash
 Inside the `backend` application container, run the following command to reset the database if needed:
 
 ```sh
-<TBD>
+uv run alembic downgrade f2ee1e269afc
+uv run alembic upgrade head
 ```
 
 ### Running on Windows (Tips & Tricks)
@@ -102,25 +103,53 @@ Unless you explicitly state otherwise, any contribution intentionally submitted 
 
 ### Local development environment setup
 
-0. Python 3.12
+0. Python 3.12 (See [.python-version](./.python-version))
 1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) Package Manager
-2. Run command:
+2. Create virtual environment and install dependencies:
 
 ```sh
-uv install
+uv sync
 ```
 
+### Run API Application
+
+1. (First run) Make sure DB is up
+
+```sh
+docker compose up postgres -d --wait
+```
+
+2. (First run) Apply latest DB schema:
+
+```sh
+uv run alembic upgrade head
+```
+
+3. Run the application:
+
+```
+uv run python -m api.main
+```
+
+4. Open Open API Documentation: http://localhost:3002/docs
+
 ### How to run tests
+
+Make sure DB is up and running:
+
+```sh
+docker compose up postgres -d --wait
+```
 
 To run tests, run the following command:
 
 ```sh
-pytest tests/
+uv run pytest tests/
 ```
 
 ### How to run code checkers & formatter
 
 ```sh
-ruff format api/ tests/
-ruff check api/ tests/ --fix
+uv run ruff format api/ tests/
+uv run ruff check api/ tests/ --fix
 ```

@@ -13,6 +13,12 @@ services:
       - "${API_DB_PORT:-5432}:5432"
     volumes:
       - ./.postgres_data:/var/lib/postgresql/data
+    # wait for postgres to be ready
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${API_DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   frontend:
     build: ../reactjs_fe_plgrnd

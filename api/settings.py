@@ -40,6 +40,13 @@ class Settings(BaseSettings):
     SALT: str = "1" * 16
     """Salt key for hashing passwords."""
 
+    JWT_SECRET: str = "your_secret_value"
+    """Secret key for JWT tokens."""
+    JWT_AUDIENCE: str = "your_audience_value"
+    """Audience for JWT tokens."""
+    JWT_LIFETIME_SECONDS: int = 3600
+    """Lifetime of JWT tokens in seconds."""
+
     DB_HOST: str = "localhost"
     DB_PORT: int = 5432
     DB_USER: str = "postgres"

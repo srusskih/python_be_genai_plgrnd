@@ -24,20 +24,20 @@ class AuthManager(AuthManagerABC):
 
     user_manager: UserManager
 
-    def __init__(self, user_manager: UserManager):
+    def __init__(
+        self,
+        user_manager: UserManager,
+        verification_token_audience: str = "your_audience_value",
+        verification_token_secret: str = "your_secret_value",
+        verification_token_lifetime_seconds: int = 3600,
+    ) -> None:
         self.user_manager = user_manager
 
-        # TODO
-        # Replace with actual audience value
-        self.verification_token_audience = "your_audience_value"
-
-        # TODO
-        # Replace with actual secret value
-        self.verification_token_secret = "your_secret_value"
-
-        # TODO
-        # Ensure it's an integer
-        self.verification_token_lifetime_seconds = int(3600)
+        self.verification_token_audience = verification_token_audience
+        self.verification_token_secret = verification_token_secret
+        self.verification_token_lifetime_seconds = (
+            verification_token_lifetime_seconds
+        )
 
     async def authenticate_user(
         self, email: str, password: str
