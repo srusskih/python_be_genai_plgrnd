@@ -1,6 +1,8 @@
-import pytest
 from unittest.mock import AsyncMock
+
+import pytest
 from fastapi import HTTPException
+
 from api.auth.dependencies import get_current_user
 from api.auth.managers import AuthManager
 

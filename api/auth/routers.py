@@ -1,8 +1,7 @@
 """Authentication API Router."""
 
-from calendar import c
-from email import message
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from ..users.models import User
@@ -11,8 +10,8 @@ from .managers import AuthManager
 from .schemas import (
     UserSignInRequest,
     UserSignInResponse,
-    UserSignOutResponse,
     UserSignOutRequest,
+    UserSignOutResponse,
 )
 
 router = APIRouter(tags=["auth", "users"])

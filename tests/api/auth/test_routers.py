@@ -5,8 +5,8 @@ from fastapi import HTTPException
 from httpx import AsyncClient
 from sqlalchemy import select
 
-from api.auth.managers import AuthManagerABC
 from api.auth.dependencies import get_auth_manager, get_current_user
+from api.auth.managers import AuthManagerABC
 
 if TYPE_CHECKING:
     from api.users.models import User

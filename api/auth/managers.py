@@ -2,10 +2,11 @@
 
 from abc import ABC, abstractmethod
 from typing import Any, Optional
+
 from api.users.managers import UserManager
 from api.users.models import User
 
-from .jwt import generate_jwt, decode_jwt, InvalidTokenError
+from .jwt import InvalidTokenError, decode_jwt, generate_jwt
 
 
 class AuthManagerABC(ABC):

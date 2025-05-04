@@ -1,7 +1,9 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from api.auth.managers import AuthManager
+
+import pytest
+
 from api.auth.jwt import generate_jwt
+from api.auth.managers import AuthManager
 from api.users.managers import UserManager
 
 

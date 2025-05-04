@@ -15,8 +15,8 @@ from api.db import async_session_maker
 from api.dependencies import get_db_session
 from api.settings import Settings
 
-from .db_helpers import create_db, db_exists, drop_db
 from ._fixtures.user_fixtures import *
+from .db_helpers import create_db, db_exists, drop_db
 
 
 @pytest.fixture(scope="session", autouse=True)

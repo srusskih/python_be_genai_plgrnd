@@ -1,11 +1,11 @@
 """User repository managers to operate on the DB."""
 
 from argon2 import PasswordHasher
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 
-from .models import User, JwtDenylist
+from .models import JwtDenylist, User
 
 
 class PasswordManager:
