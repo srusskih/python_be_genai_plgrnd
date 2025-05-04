@@ -104,7 +104,8 @@ async def test_authenticate_user_by_token_invalid_token(db_session, faker):
     auth_manager = AuthManager(user_manager=user_manager)
 
     created_user = await user_manager.create_user(user_email=faker.email())
-    # Create a fake JWT token that is invalid (e.g., malformed or signed with wrong key)
+    # Create a fake JWT token that is invalid
+    # (e.g., malformed or signed with wrong key)
     token = generate_jwt(
         {
             "sub": "me",

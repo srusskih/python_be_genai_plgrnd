@@ -15,7 +15,7 @@ from api.db import async_session_maker
 from api.dependencies import get_db_session
 from api.settings import Settings
 
-from ._fixtures.user_fixtures import *
+from ._fixtures.user_fixtures import *  # noqa: F403
 from .db_helpers import create_db, db_exists, drop_db
 
 
