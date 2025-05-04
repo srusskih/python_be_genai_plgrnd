@@ -9,10 +9,10 @@ from . import schemas
 from .dependencies import get_user_manager
 from .managers import UserAlreadyExists, UserManager
 
-router = APIRouter(prefix="/users", tags=["users"])
+router = APIRouter(tags=["users"])
 
 
-@router.post("/registrations", response_model=schemas.UserRegistrationResponse)
+@router.post("", response_model=schemas.UserRegistrationResponse)
 async def create_user(
     payload: schemas.UserRegistrationRequest,
     user_manager: Annotated[UserManager, Depends(get_user_manager)],
@@ -20,7 +20,9 @@ async def create_user(
     """Create a new user."""
     try:
         user = await user_manager.create_user(
-            payload.user.email, payload.user.password, commit=True
+            payload.registration.email,
+            payload.registration.password,
+            commit=True,
         )
     except UserAlreadyExists as e:
         raise HTTPException(status_code=409, detail=[{"msg": str(e)}]) from e

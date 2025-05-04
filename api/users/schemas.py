@@ -28,7 +28,7 @@ class UserRegistration(BaseModel):
 class UserRegistrationRequest(BaseModel):
     """User registration response DTO."""
 
-    user: UserRegistration
+    registration: UserRegistration
 
 
 class UserRegistrationResponse(BaseModel):

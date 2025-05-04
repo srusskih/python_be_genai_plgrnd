@@ -3,8 +3,9 @@
 from argon2 import PasswordHasher
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
-from .models import User
+from .models import User, JwtDenylist
 
 
 class PasswordManager:
@@ -51,6 +52,16 @@ class UserManager:
         """Set the user's password."""
         user.encrypted_password = self.password_manager.hash_password(password)
 
+    def verify_password(
+        self, plain_password: str, hashed_password: str
+    ) -> bool:
+        """Verify the user's password."""
+        # We do not want to expose instance dependencies to other classes,
+        # so we have use a "chain of methods" to call the password manager
+        return self.password_manager.verify_password(
+            plain_password, hashed_password
+        )
+
     async def create_user(
         self, user_email: str, password: str | None = None, commit: bool = False
     ) -> User:
@@ -68,3 +79,25 @@ class UserManager:
 
             await self.session.refresh(user)
         return user
+
+    async def get_user_by_email(self, email: str) -> User | None:
+        """Get user by email."""
+        query = select(User).where(User.email == email)
+        res = await self.session.execute(query)
+        user = res.scalars().first()
+        return user
+
+    async def add_to_jwt_denylist(
+        self, token: str, commit: bool = False
+    ) -> None:
+        """Add token to JWT denylist."""
+        jwt_denylist = JwtDenylist(jti=token)
+        self.session.add(jwt_denylist)
+        if commit:
+            await self.session.commit()
+
+    async def is_token_revoked(self, token: str) -> bool:
+        """Check if token is revoked."""
+        query = select(JwtDenylist).where(JwtDenylist.jti == token)
+        res = await self.session.execute(query)
+        return res.scalars().first() is not None

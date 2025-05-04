@@ -32,3 +32,6 @@ htmlcov/
 *.pot
 *.pyc
 .env
+
+# Ignore Docker Compose override file
+docker-compose.override.yml

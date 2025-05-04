@@ -1,7 +1,8 @@
 """General fixtures for tests."""
 
+import contextlib
 from pathlib import Path
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator, Callable
 
 import fastapi
 import pytest
@@ -15,6 +16,7 @@ from api.dependencies import get_db_session
 from api.settings import Settings
 
 from .db_helpers import create_db, db_exists, drop_db
+from ._fixtures.user_fixtures import *
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -117,3 +119,31 @@ async def db_session(
         await session.close()
         await transaction.rollback()
         await connection.close()
+
+
+@contextlib.contextmanager
+def dependencies_override(
+    app_instance: fastapi.FastAPI,
+    dependencies: dict[Any, Callable],
+):
+    """Override a dependency in the app instance."""
+    for dependency, override in dependencies.items():
+        app_instance.dependency_overrides[dependency] = override
+
+    yield
+
+    # remove the overrides
+    for dependency in dependencies.keys():
+        app_instance.dependency_overrides.pop(dependency, None)
+
+
+@pytest.fixture
+def dependencies_override_ctx(
+    app_instance: fastapi.FastAPI,
+) -> Callable:
+    """Fixture to override dependencies in the app instance."""
+
+    def _override(dependencies: dict[Any, Callable]):
+        return dependencies_override(app_instance, dependencies)
+
+    return _override

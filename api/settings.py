@@ -9,8 +9,11 @@ class CorsSettings(BaseModel):
 
     allow_origins: list[str] = [
         "http://localhost",
+        "http://localhost:3000",
         "http://127.0.0.1",
+        "http://127.0.0.1:3000",
         "http://0.0.0.0",
+        "http://0.0.0.0:3000",
     ]
     allow_methods: list[str] = ["*"]
     allow_headers: list[str] = ["*"]
@@ -29,12 +32,13 @@ class Settings(BaseSettings):
     )
 
     DEBUG: bool = True
-    APP_PORT: int = 3000
+    APP_PORT: int = 3002
     VERSION: str = "0.0.1"
 
     CORS_MIDDLEWARE: CorsSettings = CorsSettings()
 
     SALT: str = "1" * 16
+    """Salt key for hashing passwords."""
 
     DB_HOST: str = "localhost"
     DB_PORT: int = 5432

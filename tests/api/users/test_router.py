@@ -10,9 +10,9 @@ from api.users.models import User
 async def test_should_register_new_user(api_client, db_session):
     # Act
     response = await api_client.post(
-        "http://test/users/registrations",
+        "http://test/users",
         json={
-            "user": {
+            "registration": {
                 "email": "test@example.com",
                 "password": "password123",
                 "password_confirmation": "password123",
@@ -41,9 +41,9 @@ async def test_should_not_reg_new_user_in_case_of_invalid_params(
 ):
     # Act
     response = await api_client.post(
-        "http://test/users/registrations",
+        "http://test/users",
         json={
-            "user": {
+            "registration": {
                 "email": "test@example.com",
                 "password": "password123",
                 "password_confirmation": "password1234",
@@ -53,7 +53,7 @@ async def test_should_not_reg_new_user_in_case_of_invalid_params(
 
     # Assert that the response is successful
     assert response.status_code == 422
-    assert response.json()["detail"][0]["loc"] == ["body", "user"]
+    assert response.json()["detail"][0]["loc"] == ["body", "registration"]
     assert (
         response.json()["detail"][0]["msg"]
         == "Value error, Passwords do not match"
@@ -70,9 +70,9 @@ async def test_should_not_reg_new_user_with_same_email(api_client):
     # Arrange
     # Create a user
     response = await api_client.post(
-        "http://test/users/registrations",
+        "http://test/users",
         json={
-            "user": {
+            "registration": {
                 "email": "test@example.com",
                 "password": "password123",
                 "password_confirmation": "password123",
@@ -84,9 +84,9 @@ async def test_should_not_reg_new_user_with_same_email(api_client):
     # Act
     # Try to create a user with the same email
     response = await api_client.post(
-        "http://test/users/registrations",
+        "http://test/users",
         json={
-            "user": {
+            "registration": {
                 "email": "test@example.com",
                 "password": "password123",
                 "password_confirmation": "password123",

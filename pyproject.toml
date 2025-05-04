@@ -11,6 +11,8 @@ dependencies = [
     "fastapi>=0.115.12",
     "pydantic-settings>=2.8.1",
     "pydantic[email]>=2.10.6",
+    "pyjwt[crypto]>=2.10.1",
+    "pytest-faker>=2.0.0",
     "sqlalchemy>=2.0.39",
     "uvicorn>=0.34.0",
 ]
@@ -26,7 +28,7 @@ dev = [
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
-marks = [
+markers = [
     "integration: mark test as integration",
 ]
 

@@ -3,3 +3,5 @@
 .pytest_cache
 .ruff_cache
 tests
+# ignore config files to make sure they are not included in the image
+.env
