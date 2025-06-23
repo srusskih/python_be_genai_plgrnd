@@ -1,13 +1,13 @@
 """Article API Router."""
 
-from ssl import ALERT_DESCRIPTION_BAD_CERTIFICATE_STATUS_RESPONSE
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from api.articles import schemas
+from api.articles.dependencies import get_article_manager
 from api.articles.managers import ArticleManager
 from api.articles.models import Article
-from api.articles.dependencies import get_article_manager
 
 router = APIRouter(tags=["articles"])
 

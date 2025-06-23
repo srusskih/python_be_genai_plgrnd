@@ -1,5 +1,6 @@
 import pytest
 from httpx import AsyncClient
+
 from api.articles.models import Article
 
 
@@ -169,7 +170,9 @@ async def test_delete_article_not_found(api_client: AsyncClient):
 
 @pytest.fixture
 async def article_with_comments(db_session, api_client):
-    """Creates an article and attaches two comments, returns article_id and comment contents."""
+    """Creates an article and attaches two comments, returns article_id and
+    comment contents.
+    """
     payload = {
         "article": {
             "title": "Article with comments",
@@ -189,7 +192,9 @@ async def article_with_comments(db_session, api_client):
 
 
 @pytest.mark.integration
-async def test_article_get_by_id_includes_comments(api_client: AsyncClient, article_with_comments):
+async def test_article_get_by_id_includes_comments(
+    api_client: AsyncClient, article_with_comments
+):
     article_id, expected_comments = article_with_comments
     get_resp = await api_client.get(f"/api/articles/{article_id}")
     assert get_resp.status_code == 200
@@ -201,7 +206,9 @@ async def test_article_get_by_id_includes_comments(api_client: AsyncClient, arti
 
 
 @pytest.mark.integration
-async def test_article_list_includes_comments(api_client: AsyncClient, article_with_comments):
+async def test_article_list_includes_comments(
+    api_client: AsyncClient, article_with_comments
+):
     article_id, expected_comments = article_with_comments
     list_resp = await api_client.get("/api/articles")
     assert list_resp.status_code == 200

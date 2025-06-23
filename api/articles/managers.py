@@ -2,9 +2,10 @@
 
 from typing import Optional
 
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+
 from api.articles.models import Article, Like
 
 
@@ -50,7 +51,8 @@ class ArticleManager:
             article_id (int): The ID of the article.
 
         Returns:
-            tuple[int, int]: A tuple containing the number of likes and dislikes.
+            tuple[int, int]: A tuple containing the number of likes and
+                dislikes.
         """
         query = select(Like).where(
             Like.likeable_type == "Article", Like.likeable_id == article_id
@@ -93,10 +95,12 @@ class ArticleManager:
     ) -> dict[int, tuple[int, int]]:
         """Fetch likes/dislikes for all given article IDs in a single query.
         Args:
-            article_ids (list[int]): List of article IDs to fetch likes/dislikes for.
+            article_ids (list[int]): List of article IDs to fetch likes/
+                dislikes for.
 
         Returns:
-            dict[int, tuple[int, int]]: A mapping of article ID to (likes, dislikes).
+            dict[int, tuple[int, int]]: A mapping of article ID to
+                (likes, dislikes).
         """
         if not article_ids:
             return {}

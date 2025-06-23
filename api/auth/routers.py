@@ -9,11 +9,11 @@ from ..users.models import User
 from .dependencies import get_auth_manager, get_current_user, oauth2_scheme
 from .managers import AuthManager
 from .schemas import (
+    TokenResponse,
     UserSignInRequest,
     UserSignInResponse,
     UserSignOutRequest,
     UserSignOutResponse,
-    TokenResponse,
 )
 
 router = APIRouter(tags=["auth", "users"])
