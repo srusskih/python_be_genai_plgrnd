@@ -1,9 +1,11 @@
 """Article DB Model."""
 
-from datetime import date, datetime
-from sqlalchemy import String, Text, DateTime, func, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from datetime import datetime
 from typing import List
+
+from sqlalchemy import DateTime, ForeignKey, String, Text, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.schema import UniqueConstraint
 
 from api.db import Base
 
@@ -68,8 +70,10 @@ class Like(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     likes: Mapped[int] = mapped_column(default=0)
     dislikes: Mapped[int] = mapped_column(default=0)
-    likeable_type: Mapped[str] = mapped_column(String, nullable=False)
-    likeable_id: Mapped[int] = mapped_column(nullable=False)
+    likeable_type: Mapped[str] = mapped_column(
+        String, nullable=False, index=True
+    )
+    likeable_id: Mapped[int] = mapped_column(nullable=False, index=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=func.now()
     )
@@ -80,5 +84,6 @@ class Like(Base):
         onupdate=datetime.now,
     )
 
-    # Optionally, add a unique constraint for (likeable_type, likeable_id)
-    # __table_args__ = (UniqueConstraint('likeable_type', 'likeable_id', name='_likeable_uc'),)
+    __table_args__ = (
+        UniqueConstraint("likeable_type", "likeable_id", name="_likeable_uc"),
+    )
