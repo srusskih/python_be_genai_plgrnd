@@ -1,5 +1,6 @@
 """Article API Router."""
 
+from ssl import ALERT_DESCRIPTION_BAD_CERTIFICATE_STATUS_RESPONSE
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -51,6 +52,7 @@ async def get_article_by_id(
     article = await article_manager.get_article_by_id(article_id)
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
+    likes, dislikes = await article_manager.get_article_likes(article.id)
     return schemas.ArticleResponse(
         id=article.id,
         title=article.title,
@@ -67,6 +69,8 @@ async def get_article_by_id(
             )
             for c in getattr(article, "comments", [])
         ],
+        article_likes=likes,
+        article_dislikes=dislikes,
     )
 
 
@@ -76,26 +80,34 @@ async def list_articles(
 ):
     """List all articles."""
     articles = await article_manager.list_articles()
-    return [
-        schemas.ArticleResponse(
-            id=article.id,
-            title=article.title,
-            short_description=article.short_description,
-            description=article.description,
-            created_at=article.created_at,
-            updated_at=article.updated_at,
-            comments=[
-                schemas.CommentResponse(
-                    id=c.id,
-                    content=c.content,
-                    created_at=c.created_at,
-                    updated_at=c.updated_at,
-                )
-                for c in getattr(article, "comments", [])
-            ],
+    # Efficiently load all likes/dislikes for all articles in a single query
+    article_ids = [article.id for article in articles]
+    likes_map = await article_manager.get_likes_for_articles(article_ids)
+    result = []
+    for article in articles:
+        likes, dislikes = likes_map.get(article.id, (0, 0))
+        result.append(
+            schemas.ArticleResponse(
+                id=article.id,
+                title=article.title,
+                short_description=article.short_description,
+                description=article.description,
+                created_at=article.created_at,
+                updated_at=article.updated_at,
+                comments=[
+                    schemas.CommentResponse(
+                        id=c.id,
+                        content=c.content,
+                        created_at=c.created_at,
+                        updated_at=c.updated_at,
+                    )
+                    for c in getattr(article, "comments", [])
+                ],
+                article_likes=likes,
+                article_dislikes=dislikes,
+            )
         )
-        for article in articles
-    ]
+    return result
 
 
 @router.put("/{article_id}", response_model=schemas.ArticleResponse)

@@ -58,3 +58,27 @@ class Comment(Base):
     article: Mapped[Article] = relationship(
         "Article", back_populates="comments"
     )
+
+
+class Like(Base):
+    """Like/Dislike DB Model for polymorphic association (e.g., articles)."""
+
+    __tablename__ = "likes"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    likes: Mapped[int] = mapped_column(default=0)
+    dislikes: Mapped[int] = mapped_column(default=0)
+    likeable_type: Mapped[str] = mapped_column(String, nullable=False)
+    likeable_id: Mapped[int] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        server_default=func.now(),
+        onupdate=datetime.now,
+    )
+
+    # Optionally, add a unique constraint for (likeable_type, likeable_id)
+    # __table_args__ = (UniqueConstraint('likeable_type', 'likeable_id', name='_likeable_uc'),)

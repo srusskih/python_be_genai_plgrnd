@@ -28,3 +28,5 @@ class ArticleResponse(ArticleBase):
     created_at: datetime
     updated_at: datetime
     comments: List[CommentResponse] = []
+    article_likes: int = 0
+    article_dislikes: int = 0
