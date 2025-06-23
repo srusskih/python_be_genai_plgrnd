@@ -2,7 +2,14 @@
 
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
+
+
+class CommentResponse(BaseModel):
+    id: int
+    content: str
+    created_at: datetime
+    updated_at: datetime
 
 
 class ArticleBase(BaseModel):
@@ -20,3 +27,4 @@ class ArticleResponse(ArticleBase):
     id: int
     created_at: datetime
     updated_at: datetime
+    comments: List[CommentResponse] = []

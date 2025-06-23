@@ -4,6 +4,7 @@ from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 from api.articles.models import Article
 
 
@@ -44,7 +45,7 @@ class ArticleManager:
         return article
 
     async def get_article_by_id(self, article_id: int) -> Optional[Article]:
-        """Retrieve an article by its ID.
+        """Retrieve an article by its ID, including comments.
 
         Args:
             article_id (int): The ID of the article to retrieve.
@@ -52,16 +53,20 @@ class ArticleManager:
         Returns:
             Optional[Article]: The Article instance if found, else None.
         """
-        query = select(Article).where(Article.id == article_id)
+        query = (
+            select(Article)
+            .options(joinedload(Article.comments))
+            .where(Article.id == article_id)
+        )
         res = await self.session.execute(query)
         return res.scalars().first()
 
     async def list_articles(self) -> list[Article]:
-        """List all articles in the database.
+        """List all articles in the database, including comments.
 
         Returns:
             list[Article]: List of all Article instances.
         """
-        query = select(Article)
+        query = select(Article).options(joinedload(Article.comments))
         res = await self.session.execute(query)
-        return res.scalars().all()
+        return res.unique().scalars().all()

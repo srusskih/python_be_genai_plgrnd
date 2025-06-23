@@ -22,7 +22,24 @@ async def create_article(
         short_description=payload.article.short_description,
         description=payload.article.description,
     )
-    return schemas.ArticleResponse.model_validate(article, from_attributes=True)
+    # Manually build response to avoid async attribute errors
+    return schemas.ArticleResponse(
+        id=article.id,
+        title=article.title,
+        short_description=article.short_description,
+        description=article.description,
+        created_at=article.created_at,
+        updated_at=article.updated_at,
+        comments=[
+            schemas.CommentResponse(
+                id=c.id,
+                content=c.content,
+                created_at=c.created_at,
+                updated_at=c.updated_at,
+            )
+            for c in getattr(article, "comments", [])
+        ],
+    )
 
 
 @router.get("/{article_id}", response_model=schemas.ArticleResponse)
@@ -34,7 +51,23 @@ async def get_article_by_id(
     article = await article_manager.get_article_by_id(article_id)
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
-    return schemas.ArticleResponse.model_validate(article, from_attributes=True)
+    return schemas.ArticleResponse(
+        id=article.id,
+        title=article.title,
+        short_description=article.short_description,
+        description=article.description,
+        created_at=article.created_at,
+        updated_at=article.updated_at,
+        comments=[
+            schemas.CommentResponse(
+                id=c.id,
+                content=c.content,
+                created_at=c.created_at,
+                updated_at=c.updated_at,
+            )
+            for c in getattr(article, "comments", [])
+        ],
+    )
 
 
 @router.get("", response_model=list[schemas.ArticleResponse])
@@ -44,7 +77,23 @@ async def list_articles(
     """List all articles."""
     articles = await article_manager.list_articles()
     return [
-        schemas.ArticleResponse.model_validate(article, from_attributes=True)
+        schemas.ArticleResponse(
+            id=article.id,
+            title=article.title,
+            short_description=article.short_description,
+            description=article.description,
+            created_at=article.created_at,
+            updated_at=article.updated_at,
+            comments=[
+                schemas.CommentResponse(
+                    id=c.id,
+                    content=c.content,
+                    created_at=c.created_at,
+                    updated_at=c.updated_at,
+                )
+                for c in getattr(article, "comments", [])
+            ],
+        )
         for article in articles
     ]
 

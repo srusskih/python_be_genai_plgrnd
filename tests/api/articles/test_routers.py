@@ -165,3 +165,49 @@ async def test_delete_article_not_found(api_client: AsyncClient):
     resp = await api_client.delete("/api/articles/999999")
     assert resp.status_code == 404
     assert resp.json()["detail"] == "Article not found"
+
+
+@pytest.fixture
+async def article_with_comments(db_session, api_client):
+    """Creates an article and attaches two comments, returns article_id and comment contents."""
+    payload = {
+        "article": {
+            "title": "Article with comments",
+            "short_description": "desc",
+            "description": "desc",
+        }
+    }
+    create_resp = await api_client.post("/api/articles", json=payload)
+    article_id = create_resp.json()["id"]
+    from api.articles.models import Comment
+
+    comment1 = Comment(article_id=article_id, content="First comment")
+    comment2 = Comment(article_id=article_id, content="Second comment")
+    db_session.add_all([comment1, comment2])
+    await db_session.commit()
+    return article_id, {"First comment", "Second comment"}
+
+
+@pytest.mark.integration
+async def test_article_get_by_id_includes_comments(api_client: AsyncClient, article_with_comments):
+    article_id, expected_comments = article_with_comments
+    get_resp = await api_client.get(f"/api/articles/{article_id}")
+    assert get_resp.status_code == 200
+    data = get_resp.json()
+    assert "comments" in data
+    assert isinstance(data["comments"], list)
+    assert len(data["comments"]) == 2
+    assert {c["content"] for c in data["comments"]} == expected_comments
+
+
+@pytest.mark.integration
+async def test_article_list_includes_comments(api_client: AsyncClient, article_with_comments):
+    article_id, expected_comments = article_with_comments
+    list_resp = await api_client.get("/api/articles")
+    assert list_resp.status_code == 200
+    articles = list_resp.json()
+    found = next((a for a in articles if a["id"] == article_id), None)
+    assert found is not None
+    assert "comments" in found
+    assert len(found["comments"]) == 2
+    assert {c["content"] for c in found["comments"]} == expected_comments
